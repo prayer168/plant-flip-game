@@ -7,6 +7,13 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html, body {
+      height: 100%;
+      font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+      background: #f0f7f0;
+      color: #1a2e1d;
+    }
+
     :root {
       --green: #2d7a3a;
       --green-light: #4caf50;
@@ -14,15 +21,8 @@
       --card-back: #3a6e45;
       --text: #1a2e1d;
       --text-light: #5a7a5e;
-      --radius: 12px;
-      --shadow: 0 4px 16px rgba(0,0,0,0.12);
-    }
-
-    body {
-      font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-      background: #f0f7f0;
-      color: var(--text);
-      min-height: 100vh;
+      --radius: 10px;
+      --shadow: 0 3px 10px rgba(0,0,0,0.11);
     }
 
     /* ══════════════════════════════
@@ -33,34 +33,17 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      height: 100vh;
       padding: 24px;
       gap: 32px;
     }
 
-    .level-title {
-      text-align: center;
-    }
-
+    .level-title { text-align: center; }
     .level-title .icon { font-size: 3rem; }
-    .level-title h1 {
-      font-size: 1.5rem;
-      color: var(--green);
-      margin-top: 10px;
-      letter-spacing: 2px;
-    }
-    .level-title p {
-      font-size: 0.88rem;
-      color: var(--text-light);
-      margin-top: 6px;
-    }
+    .level-title h1 { font-size: 1.5rem; color: var(--green); margin-top: 10px; letter-spacing: 2px; }
+    .level-title p  { font-size: 0.88rem; color: var(--text-light); margin-top: 6px; }
 
-    .level-cards {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+    .level-cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
 
     .level-btn {
       background: #fff;
@@ -71,46 +54,35 @@
       text-align: center;
       cursor: pointer;
       box-shadow: var(--shadow);
-      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+      transition: transform 0.18s, box-shadow 0.18s;
       font-family: inherit;
     }
-
-    .level-btn:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    }
-
+    .level-btn:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
     .level-btn.easy   { border-color: #81c784; }
     .level-btn.medium { border-color: #ffb74d; }
     .level-btn.hard   { border-color: #e57373; }
-
     .level-btn .lv-emoji { font-size: 2rem; margin-bottom: 8px; }
-
-    .level-btn .lv-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
+    .level-btn .lv-name  { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
     .level-btn.easy   .lv-name { color: #388e3c; }
     .level-btn.medium .lv-name { color: #e65100; }
     .level-btn.hard   .lv-name { color: #c62828; }
-
-    .level-btn .lv-desc {
-      font-size: 0.75rem;
-      color: var(--text-light);
-      line-height: 1.5;
-    }
+    .level-btn .lv-desc { font-size: 0.75rem; color: var(--text-light); line-height: 1.5; }
 
     /* ══════════════════════════════
-       遊戲畫面
+       遊戲畫面 — 固定 100vh
     ══════════════════════════════ */
-    #game-screen { display: none; }
+    #game-screen {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
 
     header {
+      flex-shrink: 0;
       background: var(--green);
       color: #fff;
-      padding: 12px 20px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -118,90 +90,73 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    header h1 { font-size: 1rem; font-weight: 700; letter-spacing: 1px; }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    header h1 { font-size: 0.95rem; font-weight: 700; letter-spacing: 1px; }
 
     .level-badge {
-      font-size: 0.7rem;
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-weight: 600;
+      font-size: 0.68rem; padding: 2px 10px;
+      border-radius: 20px; font-weight: 600;
     }
-
     .level-badge.easy   { background: #c8e6c9; color: #2e7d32; }
     .level-badge.medium { background: #ffe0b2; color: #e65100; }
     .level-badge.hard   { background: #ffcdd2; color: #c62828; }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .header-right { display: flex; align-items: center; gap: 10px; }
 
-    .progress-bar-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.82rem;
-    }
+    .progress-bar-wrap { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; }
+    .progress-bar { width: 90px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #a5d6a7; border-radius: 4px; transition: width 0.4s ease; width: 0%; }
 
-    .progress-bar {
-      width: 100px;
-      height: 7px;
-      background: rgba(255,255,255,0.3);
-      border-radius: 4px;
+    .btn-change-level {
+      font-size: 0.7rem; background: rgba(255,255,255,0.15); color: #fff;
+      border: 1px solid rgba(255,255,255,0.4); border-radius: 20px;
+      padding: 3px 10px; cursor: pointer; font-family: inherit;
+      transition: background 0.2s; white-space: nowrap;
+    }
+    .btn-change-level:hover { background: rgba(255,255,255,0.28); }
+
+    /* Main area fills remaining height */
+    .main-layout {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      gap: 14px;
+      padding: 14px;
       overflow: hidden;
     }
 
-    .progress-fill {
-      height: 100%;
-      background: #a5d6a7;
-      border-radius: 4px;
-      transition: width 0.4s ease;
-      width: 0%;
-    }
-
-    .btn-change-level {
-      font-size: 0.72rem;
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 20px;
-      padding: 4px 12px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.2s;
-      white-space: nowrap;
-    }
-
-    .btn-change-level:hover { background: rgba(255,255,255,0.28); }
-
-    .main-layout {
-      display: flex;
-      gap: 20px;
-      padding: 20px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
     /* ── Card Grid ── */
-    .grid-section { flex: 1; min-width: 0; }
+    .grid-section {
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
 
     .card-grid {
+      flex: 1;
+      min-height: 0;
       display: grid;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
-    .card-grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
+    /* Difficulty layouts — rows + cols both defined so grid fills height */
+    .card-grid.grid-easy   {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+    }
+    .card-grid.grid-medium {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+    }
+    .card-grid.grid-hard {
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+    }
 
     .card {
-      aspect-ratio: 3/4;
+      min-height: 0;
       cursor: pointer;
       perspective: 800px;
       user-select: none;
@@ -212,7 +167,7 @@
       height: 100%;
       position: relative;
       transform-style: preserve-3d;
-      transition: transform 0.45s cubic-bezier(.4,0,.2,1);
+      transition: transform 0.42s cubic-bezier(.4,0,.2,1);
       border-radius: var(--radius);
     }
 
@@ -231,102 +186,89 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 8px 6px;
     }
 
-    .card-back {
-      background: var(--card-back);
-      gap: 6px;
-    }
+    .card-back { background: var(--card-back); gap: 4px; }
+    .card-back .leaf { font-size: 1.5rem; opacity: 0.65; }
+    .card-back .back-label { font-size: 0.52rem; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
 
-    .card-back .leaf { font-size: 1.8rem; opacity: 0.65; }
-    .card-back .back-label { font-size: 0.56rem; color: rgba(255,255,255,0.45); letter-spacing: 1px; }
-
-    .card-front {
-      transform: rotateY(180deg);
-      text-align: center;
-      gap: 6px;
-    }
+    .card-front { transform: rotateY(180deg); text-align: center; gap: 5px; }
 
     .name-card .card-front {
       background: var(--green-pale);
       border: 2px solid var(--green-light);
     }
-
     .name-card .card-front .cn-name {
-      font-size: 1rem;
       font-weight: 700;
       color: var(--green);
-      line-height: 1.4;
+      line-height: 1.3;
     }
-
     .name-card .card-front .card-type-tag {
-      font-size: 0.56rem;
-      background: var(--green-light);
-      color: #fff;
-      border-radius: 20px;
-      padding: 2px 8px;
+      background: var(--green-light); color: #fff;
+      border-radius: 20px; padding: 1px 7px;
     }
 
     .clue-card .card-front {
       background: #fff;
       border: 2px solid #b0bec5;
     }
-
     .clue-card .card-front .clue-text {
-      font-size: 0.7rem;
       color: var(--text);
-      line-height: 1.65;
+      line-height: 1.55;
       text-align: center;
     }
-
     .clue-card .card-front .card-type-tag {
-      font-size: 0.56rem;
-      background: #78909c;
-      color: #fff;
-      border-radius: 20px;
-      padding: 2px 8px;
+      background: #78909c; color: #fff;
+      border-radius: 20px; padding: 1px 7px;
     }
 
-    .card.matched .card-face {
-      box-shadow: 0 0 0 3px var(--green-light), var(--shadow);
-    }
+    .card-type-tag { font-size: 0.54rem; }
+
+    /* Font sizes per difficulty */
+    .card-grid.grid-easy .cn-name   { font-size: 1.05rem; }
+    .card-grid.grid-easy .clue-text { font-size: 0.75rem; }
+
+    .card-grid.grid-medium .cn-name   { font-size: 0.82rem; }
+    .card-grid.grid-medium .clue-text { font-size: 0.62rem; }
+
+    .card-grid.grid-hard .cn-name   { font-size: 0.72rem; }
+    .card-grid.grid-hard .clue-text { font-size: 0.56rem; }
+
+    .card.matched .card-face { box-shadow: 0 0 0 3px var(--green-light), var(--shadow); }
 
     /* ── Info Panel ── */
-    .info-panel { width: 250px; flex-shrink: 0; }
-
-    .info-panel h2 {
-      font-size: 0.9rem;
-      color: var(--green);
-      margin-bottom: 12px;
+    .info-panel {
+      width: 230px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
+    .info-panel h2 { font-size: 0.88rem; color: var(--green); margin-bottom: 10px; flex-shrink: 0; }
+
     .info-placeholder {
-      background: #fff;
-      border-radius: var(--radius);
-      padding: 20px 16px;
-      text-align: center;
-      color: var(--text-light);
-      font-size: 0.82rem;
-      line-height: 1.8;
+      background: #fff; border-radius: var(--radius);
+      padding: 18px 14px; text-align: center;
+      color: var(--text-light); font-size: 0.8rem; line-height: 1.8;
       box-shadow: var(--shadow);
     }
 
     .matched-list {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-height: calc(100vh - 130px);
-      overflow-y: auto;
+      gap: 8px;
       padding-right: 2px;
     }
 
     .plant-card {
-      background: #fff;
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      box-shadow: var(--shadow);
-      animation: slideIn 0.3s ease;
+      background: #fff; border-radius: var(--radius);
+      padding: 10px 12px; box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease; flex-shrink: 0;
     }
 
     @keyframes slideIn {
@@ -334,120 +276,74 @@
       to   { opacity: 1; transform: translateX(0); }
     }
 
-    .plant-card .pc-name { font-size: 0.9rem; font-weight: 700; color: var(--green); margin-bottom: 2px; }
-    .plant-card .pc-sci  { font-size: 0.68rem; font-style: italic; color: var(--text-light); margin-bottom: 6px; }
+    .plant-card .pc-name { font-size: 0.88rem; font-weight: 700; color: var(--green); margin-bottom: 2px; }
+    .plant-card .pc-sci  { font-size: 0.66rem; font-style: italic; color: var(--text-light); margin-bottom: 5px; }
     .plant-card .pc-tag  {
-      display: inline-block;
-      background: var(--green-pale);
-      color: var(--green);
-      border-radius: 4px;
-      padding: 1px 6px;
-      font-size: 0.65rem;
-      margin-bottom: 4px;
+      display: inline-block; background: var(--green-pale); color: var(--green);
+      border-radius: 4px; padding: 1px 6px; font-size: 0.63rem; margin-bottom: 3px;
     }
-    .plant-card .pc-body { font-size: 0.74rem; line-height: 1.65; color: var(--text); }
+    .plant-card .pc-body { font-size: 0.72rem; line-height: 1.6; color: var(--text); }
 
     /* ── Completion Overlay ── */
     .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); z-index: 100;
+      align-items: center; justify-content: center;
     }
-
     .overlay.show { display: flex; }
 
     .completion-box {
-      background: #fff;
-      border-radius: 20px;
-      padding: 32px 28px;
-      max-width: 460px;
-      width: 92%;
-      text-align: center;
+      background: #fff; border-radius: 20px; padding: 28px 24px;
+      max-width: 460px; width: 92%; text-align: center;
       box-shadow: 0 8px 40px rgba(0,0,0,0.25);
       animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1);
     }
-
     @keyframes popIn {
       from { opacity: 0; transform: scale(0.8); }
       to   { opacity: 1; transform: scale(1); }
     }
-
-    .completion-box .trophy  { font-size: 3rem; margin-bottom: 10px; }
-    .completion-box h2       { font-size: 1.4rem; color: var(--green); margin-bottom: 6px; }
-    .completion-box .subtitle { font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px; }
+    .completion-box .trophy   { font-size: 2.8rem; margin-bottom: 8px; }
+    .completion-box h2        { font-size: 1.3rem; color: var(--green); margin-bottom: 5px; }
+    .completion-box .subtitle { font-size: 0.82rem; color: var(--text-light); margin-bottom: 18px; }
 
     .completion-plants {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 24px;
+      display: flex; flex-wrap: wrap; gap: 7px;
+      justify-content: center; margin-bottom: 20px;
     }
-
     .completion-plants span {
-      background: var(--green-pale);
-      color: var(--green);
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      background: var(--green-pale); color: var(--green);
+      border-radius: 20px; padding: 3px 12px; font-size: 0.78rem; font-weight: 600;
     }
 
-    .completion-btns {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+    .completion-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
     .btn-primary {
-      background: var(--green);
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      padding: 11px 28px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background 0.2s;
+      background: var(--green); color: #fff; border: none;
+      border-radius: 50px; padding: 10px 26px; font-size: 0.92rem;
+      font-family: inherit; cursor: pointer; transition: background 0.2s;
     }
-
     .btn-primary:hover { background: var(--green-light); }
 
     .btn-secondary {
-      background: #fff;
-      color: var(--green);
-      border: 2px solid var(--green);
-      border-radius: 50px;
-      padding: 11px 28px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      background: #fff; color: var(--green); border: 2px solid var(--green);
+      border-radius: 50px; padding: 10px 26px; font-size: 0.92rem;
+      font-family: inherit; cursor: pointer; transition: background 0.2s;
     }
-
     .btn-secondary:hover { background: var(--green-pale); }
 
     /* ── Responsive ── */
-    @media (max-width: 900px) {
-      .main-layout { flex-direction: column; }
-      .info-panel { width: 100%; }
-      .matched-list { max-height: none; flex-direction: row; flex-wrap: wrap; }
-      .plant-card { flex: 1 1 220px; }
+    @media (max-width: 860px) {
+      .main-layout { flex-direction: column; padding: 10px; gap: 10px; }
+      .info-panel { width: 100%; flex-direction: row; gap: 8px; flex-wrap: wrap; max-height: 140px; }
+      .info-panel h2 { display: none; }
+      .matched-list { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; }
+      .plant-card { min-width: 200px; }
     }
 
-    @media (max-width: 640px) {
-      .card-grid.cols-6 { grid-template-columns: repeat(4, 1fr); }
-      header h1 { font-size: 0.88rem; }
-    }
-
-    @media (max-width: 400px) {
-      .card-grid { grid-template-columns: repeat(3, 1fr) !important; }
-      .level-cards { flex-direction: column; align-items: center; }
+    @media (max-width: 540px) {
+      .card-grid.grid-easy   { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); }
+      .card-grid.grid-medium { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); }
+      .card-grid.grid-hard   { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, 1fr); }
     }
   </style>
 </head>
@@ -501,7 +397,7 @@
     </section>
     <aside class="info-panel">
       <h2>🌱 植物小知識</h2>
-      <div id="info-area">
+      <div id="info-area" style="display:contents">
         <div class="info-placeholder">配對成功後<br>這裡會顯示<br>植物的詳細資訊</div>
       </div>
     </aside>
@@ -525,107 +421,71 @@
 <script>
 const ALL_PLANTS = [
   {
-    id: 1,
-    cn: '小花蔓澤蘭',
-    sci: 'Mikania micrantha',
-    origin: '中南美洲',
+    id: 1, cn: '小花蔓澤蘭', sci: 'Mikania micrantha', origin: '中南美洲',
     clue: '生長速度極快，能短時間覆蓋並悶死其他植物，又稱「綠癌」',
     detail: '是台灣危害最嚴重的外來入侵植物之一，繁殖力強，難以根除，對山林生態破壞極大。'
   },
   {
-    id: 2,
-    cn: '銀合歡',
-    sci: 'Leucaena leucocephala',
-    origin: '中美洲',
+    id: 2, cn: '銀合歡', sci: 'Leucaena leucocephala', origin: '中美洲',
     clue: '耐旱耐貧瘠，種子量極大，容易形成純林排擠原生植物',
     detail: '是世界百大惡性外來入侵種之一，廣泛分布於台灣低海拔地區，根系分泌物可抑制其他植物生長。'
   },
   {
-    id: 3,
-    cn: '大花咸豐草',
-    sci: 'Bidens pilosa var. radiata',
-    origin: '熱帶美洲',
+    id: 3, cn: '大花咸豐草', sci: 'Bidens pilosa var. radiata', origin: '熱帶美洲',
     clue: '種子帶倒刺，易附著衣物與動物毛皮傳播，遍布農田與荒地',
     detail: '俗稱「鬼針草」，適應力超強，與原生植物競爭激烈，也是蜜蜂的重要蜜源植物。'
   },
   {
-    id: 4,
-    cn: '布袋蓮',
-    sci: 'Eichhornia crassipes',
-    origin: '南美洲',
+    id: 4, cn: '布袋蓮', sci: 'Eichhornia crassipes', origin: '南美洲',
     clue: '大量覆蓋水面，阻擋陽光，造成水中生物缺氧死亡',
     detail: '曾被引進作為豬飼料與觀賞植物，因繁殖力驚人，現已嚴重堵塞全台灣大小河道與水塘。'
   },
   {
-    id: 5,
-    cn: '南美蟛蜞菊',
-    sci: 'Sphagneticola trilobata',
-    origin: '熱帶美洲',
+    id: 5, cn: '南美蟛蜞菊', sci: 'Sphagneticola trilobata', origin: '熱帶美洲',
     clue: '匍匐莖快速蔓延，形成地毯狀覆蓋，排擠低矮原生草本',
     detail: '花色鮮黃，外觀與本土蟛蜞菊相似，常被誤認，廣泛入侵台灣海岸、路旁與開闊地。'
   },
   {
-    id: 6,
-    cn: '香澤蘭',
-    sci: 'Chromolaena odorata',
-    origin: '中南美洲',
+    id: 6, cn: '香澤蘭', sci: 'Chromolaena odorata', origin: '中南美洲',
     clue: '含揮發性化學物質，抑制周邊植物生長，乾燥後極易燃燒',
     detail: '又稱「飛機草」，加劇山林火災風險，火燒後更能快速復原並擴張，是熱帶地區惡名昭彰的雜草。'
   },
   {
-    id: 7,
-    cn: '美洲含羞草',
-    sci: 'Mimosa diplotricha',
-    origin: '熱帶美洲',
+    id: 7, cn: '美洲含羞草', sci: 'Mimosa diplotricha', origin: '熱帶美洲',
     clue: '莖具硬刺，大量蔓延形成密叢，嚴重影響農業與畜牧用地',
     detail: '與本土含羞草相似但刺更多，繁殖力極強，一旦入侵農田便難以清除，造成農民重大損失。'
   },
   {
-    id: 8,
-    cn: '紅毛草',
-    sci: 'Melinis repens',
-    origin: '非洲',
+    id: 8, cn: '紅毛草', sci: 'Melinis repens', origin: '非洲',
     clue: '耐旱耐火，火燒後快速復原，大量壓縮原生草地的生存空間',
     detail: '穗狀花序帶紅色絨毛，外觀特殊，常見於台灣南部低海拔荒地與路旁，嚴重改變草原生態結構。'
   },
   {
-    id: 9,
-    cn: '巴拉草',
-    sci: 'Urochloa mutica',
-    origin: '非洲',
+    id: 9, cn: '巴拉草', sci: 'Urochloa mutica', origin: '非洲',
     clue: '莖節落地即可生根，入侵河岸濕地，造成水流阻塞',
     detail: '原作為牧草引進，後因大量逸出野外，現已佔領台灣多條河岸，排擠原生植被並影響行水空間。'
   },
   {
-    id: 10,
-    cn: '粉綠狐尾藻',
-    sci: 'Myriophyllum aquaticum',
-    origin: '南美洲',
+    id: 10, cn: '粉綠狐尾藻', sci: 'Myriophyllum aquaticum', origin: '南美洲',
     clue: '大量繁殖於水面，堵塞水道，破壞水域生物多樣性',
     detail: '水族愛好者常用的水草，因棄養或逸出而入侵台灣各地水域，繁殖力極強，難以根除。'
   },
   {
-    id: 11,
-    cn: '馬纓丹',
-    sci: 'Lantana camara',
-    origin: '熱帶美洲',
+    id: 11, cn: '馬纓丹', sci: 'Lantana camara', origin: '熱帶美洲',
     clue: '果實對鳥類有毒，形成密叢排擠原生灌木，是世界百大惡性入侵種',
     detail: '花色多變，曾作為園藝植物引進，葉片揉碎有特殊氣味，果實黑色，對多種動物具有毒性。'
   },
   {
-    id: 12,
-    cn: '刺軸含羞木',
-    sci: 'Mimosa pigra',
-    origin: '熱帶美洲',
+    id: 12, cn: '刺軸含羞木', sci: 'Mimosa pigra', origin: '熱帶美洲',
     clue: '莖具堅硬尖刺，繁殖後形成幾乎無法穿越的密灌叢，入侵濕地',
     detail: '被列為世界最惡性的濕地入侵植物之一，一旦在濕地建立族群便徹底改變當地生態結構，極難清除。'
   }
 ];
 
 const LEVEL_CONFIG = {
-  4:  { label: '初級', cls: 'easy',   cols: 'cols-4', emoji: '🌱' },
-  8:  { label: '中級', cls: 'medium', cols: 'cols-4', emoji: '🌿' },
-  12: { label: '高級', cls: 'hard',   cols: 'cols-6', emoji: '🌳' }
+  4:  { label: '初級', cls: 'easy',   gridClass: 'grid-easy',   emoji: '🌱' },
+  8:  { label: '中級', cls: 'medium', gridClass: 'grid-medium', emoji: '🌿' },
+  12: { label: '高級', cls: 'hard',   gridClass: 'grid-hard',   emoji: '🌳' }
 };
 
 let activePlants = [];
@@ -635,19 +495,28 @@ let flippedCards = [];
 let matchedCount = 0;
 let isLocked = false;
 
-// ── 難度選擇 ──
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function startGame(pairCount) {
   currentPairCount = pairCount;
-  document.getElementById('level-screen').style.display = 'none';
-  document.getElementById('game-screen').style.display = 'block';
-
   const cfg = LEVEL_CONFIG[pairCount];
+
+  document.getElementById('level-screen').style.display = 'none';
+  const gameScreen = document.getElementById('game-screen');
+  gameScreen.style.display = 'flex';
+
   const badge = document.getElementById('level-badge');
   badge.textContent = cfg.emoji + ' ' + cfg.label;
   badge.className = 'level-badge ' + cfg.cls;
 
   const grid = document.getElementById('card-grid');
-  grid.className = 'card-grid ' + cfg.cols;
+  grid.className = 'card-grid ' + cfg.gridClass;
 
   activePlants = shuffle([...ALL_PLANTS]).slice(0, pairCount);
   initGame();
@@ -657,15 +526,6 @@ function goToLevelSelect() {
   document.getElementById('overlay').classList.remove('show');
   document.getElementById('game-screen').style.display = 'none';
   document.getElementById('level-screen').style.display = 'flex';
-}
-
-// ── 遊戲初始化 ──
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
 }
 
 function buildCards() {
@@ -716,21 +576,15 @@ function initGame() {
   renderGrid();
 }
 
-// ── 遊戲邏輯 ──
 function onCardClick(index) {
   if (isLocked) return;
   const card = cards[index];
   if (card.isFlipped || card.isMatched) return;
   if (flippedCards.length === 2) return;
-
   card.isFlipped = true;
   flippedCards.push(card);
   updateCardEl(index);
-
-  if (flippedCards.length === 2) {
-    isLocked = true;
-    setTimeout(checkMatch, 1000);
-  }
+  if (flippedCards.length === 2) { isLocked = true; setTimeout(checkMatch, 1000); }
 }
 
 function updateCardEl(index) {
@@ -744,22 +598,18 @@ function updateCardEl(index) {
 function checkMatch() {
   const [a, b] = flippedCards;
   const isMatch = (a.plantId === b.plantId) && (a.type !== b.type);
-
   if (isMatch) {
     a.isMatched = b.isMatched = true;
     a.isFlipped = b.isFlipped = false;
-    updateCardEl(a.index);
-    updateCardEl(b.index);
+    updateCardEl(a.index); updateCardEl(b.index);
     matchedCount++;
     updateProgress();
     showPlantInfo(a.plantId);
     if (matchedCount === activePlants.length) setTimeout(showCompletion, 600);
   } else {
     a.isFlipped = b.isFlipped = false;
-    updateCardEl(a.index);
-    updateCardEl(b.index);
+    updateCardEl(a.index); updateCardEl(b.index);
   }
-
   flippedCards = [];
   isLocked = false;
 }
@@ -787,7 +637,6 @@ function showPlantInfo(plantId) {
   list.insertBefore(item, list.firstChild);
 }
 
-// ── 完成畫面 ──
 function showCompletion() {
   const cfg = LEVEL_CONFIG[currentPairCount];
   document.getElementById('completion-subtitle').textContent =
