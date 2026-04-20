@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台灣外來種植物翻牌遊戲</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #2d7a3a;
+      --green-light: #4caf50;
+      --green-pale: #e8f5e9;
+      --card-back: #3a6e45;
+      --text: #1a2e1d;
+      --text-light: #5a7a5e;
+      --radius: 12px;
+      --shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    body {
+      font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+      background: #f0f7f0;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ══════════════════════════════
+       難度選擇畫面
+    ══════════════════════════════ */
+    #level-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      gap: 32px;
+    }
+
+    .level-title {
+      text-align: center;
+    }
+
+    .level-title .icon { font-size: 3rem; }
+    .level-title h1 {
+      font-size: 1.5rem;
+      color: var(--green);
+      margin-top: 10px;
+      letter-spacing: 2px;
+    }
+    .level-title p {
+      font-size: 0.88rem;
+      color: var(--text-light);
+      margin-top: 6px;
+    }
+
+    .level-cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .level-btn {
+      background: #fff;
+      border: 2px solid transparent;
+      border-radius: 16px;
+      padding: 24px 28px;
+      width: 160px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+      font-family: inherit;
+    }
+
+    .level-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    .level-btn.easy   { border-color: #81c784; }
+    .level-btn.medium { border-color: #ffb74d; }
+    .level-btn.hard   { border-color: #e57373; }
+
+    .level-btn .lv-emoji { font-size: 2rem; margin-bottom: 8px; }
+
+    .level-btn .lv-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .level-btn.easy   .lv-name { color: #388e3c; }
+    .level-btn.medium .lv-name { color: #e65100; }
+    .level-btn.hard   .lv-name { color: #c62828; }
+
+    .level-btn .lv-desc {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════
+       遊戲畫面
+    ══════════════════════════════ */
+    #game-screen { display: none; }
+
+    header {
+      background: var(--green);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header h1 { font-size: 1rem; font-weight: 700; letter-spacing: 1px; }
+
+    .level-badge {
+      font-size: 0.7rem;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .level-badge.easy   { background: #c8e6c9; color: #2e7d32; }
+    .level-badge.medium { background: #ffe0b2; color: #e65100; }
+    .level-badge.hard   { background: #ffcdd2; color: #c62828; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .progress-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+    }
+
+    .progress-bar {
+      width: 100px;
+      height: 7px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #a5d6a7;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .btn-change-level {
+      font-size: 0.72rem;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-change-level:hover { background: rgba(255,255,255,0.28); }
+
+    .main-layout {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── Card Grid ── */
+    .grid-section { flex: 1; min-width: 0; }
+
+    .card-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .card-grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
+
+    .card {
+      aspect-ratio: 3/4;
+      cursor: pointer;
+      perspective: 800px;
+      user-select: none;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(.4,0,.2,1);
+      border-radius: var(--radius);
+    }
+
+    .card.flipped .card-inner,
+    .card.matched .card-inner { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .card-back {
+      background: var(--card-back);
+      gap: 6px;
+    }
+
+    .card-back .leaf { font-size: 1.8rem; opacity: 0.65; }
+    .card-back .back-label { font-size: 0.56rem; color: rgba(255,255,255,0.45); letter-spacing: 1px; }
+
+    .card-front {
+      transform: rotateY(180deg);
+      text-align: center;
+      gap: 6px;
+    }
+
+    .name-card .card-front {
+      background: var(--green-pale);
+      border: 2px solid var(--green-light);
+    }
+
+    .name-card .card-front .cn-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--green);
+      line-height: 1.4;
+    }
+
+    .name-card .card-front .card-type-tag {
+      font-size: 0.56rem;
+      background: var(--green-light);
+      color: #fff;
+      border-radius: 20px;
+      padding: 2px 8px;
+    }
+
+    .clue-card .card-front {
+      background: #fff;
+      border: 2px solid #b0bec5;
+    }
+
+    .clue-card .card-front .clue-text {
+      font-size: 0.7rem;
+      color: var(--text);
+      line-height: 1.65;
+      text-align: center;
+    }
+
+    .clue-card .card-front .card-type-tag {
+      font-size: 0.56rem;
+      background: #78909c;
+      color: #fff;
+      border-radius: 20px;
+      padding: 2px 8px;
+    }
+
+    .card.matched .card-face {
+      box-shadow: 0 0 0 3px var(--green-light), var(--shadow);
+    }
+
+    /* ── Info Panel ── */
+    .info-panel { width: 250px; flex-shrink: 0; }
+
+    .info-panel h2 {
+      font-size: 0.9rem;
+      color: var(--green);
+      margin-bottom: 12px;
+    }
+
+    .info-placeholder {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.82rem;
+      line-height: 1.8;
+      box-shadow: var(--shadow);
+    }
+
+    .matched-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: calc(100vh - 130px);
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .plant-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(10px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .plant-card .pc-name { font-size: 0.9rem; font-weight: 700; color: var(--green); margin-bottom: 2px; }
+    .plant-card .pc-sci  { font-size: 0.68rem; font-style: italic; color: var(--text-light); margin-bottom: 6px; }
+    .plant-card .pc-tag  {
+      display: inline-block;
+      background: var(--green-pale);
+      color: var(--green);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.65rem;
+      margin-bottom: 4px;
+    }
+    .plant-card .pc-body { font-size: 0.74rem; line-height: 1.65; color: var(--text); }
+
+    /* ── Completion Overlay ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay.show { display: flex; }
+
+    .completion-box {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px 28px;
+      max-width: 460px;
+      width: 92%;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+      animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .completion-box .trophy  { font-size: 3rem; margin-bottom: 10px; }
+    .completion-box h2       { font-size: 1.4rem; color: var(--green); margin-bottom: 6px; }
+    .completion-box .subtitle { font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px; }
+
+    .completion-plants {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .completion-plants span {
+      background: var(--green-pale);
+      color: var(--green);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .completion-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 11px 28px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--green-light); }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--green);
+      border: 2px solid var(--green);
+      border-radius: 50px;
+      padding: 11px 28px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover { background: var(--green-pale); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .main-layout { flex-direction: column; }
+      .info-panel { width: 100%; }
+      .matched-list { max-height: none; flex-direction: row; flex-wrap: wrap; }
+      .plant-card { flex: 1 1 220px; }
+    }
+
+    @media (max-width: 640px) {
+      .card-grid.cols-6 { grid-template-columns: repeat(4, 1fr); }
+      header h1 { font-size: 0.88rem; }
+    }
+
+    @media (max-width: 400px) {
+      .card-grid { grid-template-columns: repeat(3, 1fr) !important; }
+      .level-cards { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ 難度選擇畫面 ══ -->
+<div id="level-screen">
+  <div class="level-title">
+    <div class="icon">🌿</div>
+    <h1>台灣外來種植物翻牌遊戲</h1>
+    <p>選擇難度開始遊戲</p>
+  </div>
+  <div class="level-cards">
+    <button class="level-btn easy"   onclick="startGame(4)">
+      <div class="lv-emoji">🌱</div>
+      <div class="lv-name">初級</div>
+      <div class="lv-desc">4 對植物<br>共 8 張牌<br>適合入門</div>
+    </button>
+    <button class="level-btn medium" onclick="startGame(8)">
+      <div class="lv-emoji">🌿</div>
+      <div class="lv-name">中級</div>
+      <div class="lv-desc">8 對植物<br>共 16 張牌<br>挑戰記憶力</div>
+    </button>
+    <button class="level-btn hard"   onclick="startGame(12)">
+      <div class="lv-emoji">🌳</div>
+      <div class="lv-name">高級</div>
+      <div class="lv-desc">12 對植物<br>共 24 張牌<br>全面考驗</div>
+    </button>
+  </div>
+</div>
+
+<!-- ══ 遊戲畫面 ══ -->
+<div id="game-screen">
+  <header>
+    <div class="header-left">
+      <h1>🌿 外來種植物翻牌</h1>
+      <span class="level-badge" id="level-badge"></span>
+    </div>
+    <div class="header-right">
+      <div class="progress-bar-wrap">
+        <span id="progress-text">0 / 0</span>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+      <button class="btn-change-level" onclick="goToLevelSelect()">換關卡</button>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <section class="grid-section">
+      <div class="card-grid" id="card-grid"></div>
+    </section>
+    <aside class="info-panel">
+      <h2>🌱 植物小知識</h2>
+      <div id="info-area">
+        <div class="info-placeholder">配對成功後<br>這裡會顯示<br>植物的詳細資訊</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ══ 完成 Overlay ══ -->
+<div class="overlay" id="overlay">
+  <div class="completion-box">
+    <div class="trophy">🏆</div>
+    <h2>恭喜完成！</h2>
+    <p class="subtitle" id="completion-subtitle"></p>
+    <div class="completion-plants" id="completion-plants"></div>
+    <div class="completion-btns">
+      <button class="btn-primary"   id="btn-restart">再玩一次</button>
+      <button class="btn-secondary" id="btn-level-select">換關卡</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ALL_PLANTS = [
+  {
+    id: 1,
+    cn: '小花蔓澤蘭',
+    sci: 'Mikania micrantha',
+    origin: '中南美洲',
+    clue: '生長速度極快，能短時間覆蓋並悶死其他植物，又稱「綠癌」',
+    detail: '是台灣危害最嚴重的外來入侵植物之一，繁殖力強，難以根除，對山林生態破壞極大。'
+  },
+  {
+    id: 2,
+    cn: '銀合歡',
+    sci: 'Leucaena leucocephala',
+    origin: '中美洲',
+    clue: '耐旱耐貧瘠，種子量極大，容易形成純林排擠原生植物',
+    detail: '是世界百大惡性外來入侵種之一，廣泛分布於台灣低海拔地區，根系分泌物可抑制其他植物生長。'
+  },
+  {
+    id: 3,
+    cn: '大花咸豐草',
+    sci: 'Bidens pilosa var. radiata',
+    origin: '熱帶美洲',
+    clue: '種子帶倒刺，易附著衣物與動物毛皮傳播，遍布農田與荒地',
+    detail: '俗稱「鬼針草」，適應力超強，與原生植物競爭激烈，也是蜜蜂的重要蜜源植物。'
+  },
+  {
+    id: 4,
+    cn: '布袋蓮',
+    sci: 'Eichhornia crassipes',
+    origin: '南美洲',
+    clue: '大量覆蓋水面，阻擋陽光，造成水中生物缺氧死亡',
+    detail: '曾被引進作為豬飼料與觀賞植物，因繁殖力驚人，現已嚴重堵塞全台灣大小河道與水塘。'
+  },
+  {
+    id: 5,
+    cn: '南美蟛蜞菊',
+    sci: 'Sphagneticola trilobata',
+    origin: '熱帶美洲',
+    clue: '匍匐莖快速蔓延，形成地毯狀覆蓋，排擠低矮原生草本',
+    detail: '花色鮮黃，外觀與本土蟛蜞菊相似，常被誤認，廣泛入侵台灣海岸、路旁與開闊地。'
+  },
+  {
+    id: 6,
+    cn: '香澤蘭',
+    sci: 'Chromolaena odorata',
+    origin: '中南美洲',
+    clue: '含揮發性化學物質，抑制周邊植物生長，乾燥後極易燃燒',
+    detail: '又稱「飛機草」，加劇山林火災風險，火燒後更能快速復原並擴張，是熱帶地區惡名昭彰的雜草。'
+  },
+  {
+    id: 7,
+    cn: '美洲含羞草',
+    sci: 'Mimosa diplotricha',
+    origin: '熱帶美洲',
+    clue: '莖具硬刺，大量蔓延形成密叢，嚴重影響農業與畜牧用地',
+    detail: '與本土含羞草相似但刺更多，繁殖力極強，一旦入侵農田便難以清除，造成農民重大損失。'
+  },
+  {
+    id: 8,
+    cn: '紅毛草',
+    sci: 'Melinis repens',
+    origin: '非洲',
+    clue: '耐旱耐火，火燒後快速復原，大量壓縮原生草地的生存空間',
+    detail: '穗狀花序帶紅色絨毛，外觀特殊，常見於台灣南部低海拔荒地與路旁，嚴重改變草原生態結構。'
+  },
+  {
+    id: 9,
+    cn: '巴拉草',
+    sci: 'Urochloa mutica',
+    origin: '非洲',
+    clue: '莖節落地即可生根，入侵河岸濕地，造成水流阻塞',
+    detail: '原作為牧草引進，後因大量逸出野外，現已佔領台灣多條河岸，排擠原生植被並影響行水空間。'
+  },
+  {
+    id: 10,
+    cn: '粉綠狐尾藻',
+    sci: 'Myriophyllum aquaticum',
+    origin: '南美洲',
+    clue: '大量繁殖於水面，堵塞水道，破壞水域生物多樣性',
+    detail: '水族愛好者常用的水草，因棄養或逸出而入侵台灣各地水域，繁殖力極強，難以根除。'
+  },
+  {
+    id: 11,
+    cn: '馬纓丹',
+    sci: 'Lantana camara',
+    origin: '熱帶美洲',
+    clue: '果實對鳥類有毒，形成密叢排擠原生灌木，是世界百大惡性入侵種',
+    detail: '花色多變，曾作為園藝植物引進，葉片揉碎有特殊氣味，果實黑色，對多種動物具有毒性。'
+  },
+  {
+    id: 12,
+    cn: '刺軸含羞木',
+    sci: 'Mimosa pigra',
+    origin: '熱帶美洲',
+    clue: '莖具堅硬尖刺，繁殖後形成幾乎無法穿越的密灌叢，入侵濕地',
+    detail: '被列為世界最惡性的濕地入侵植物之一，一旦在濕地建立族群便徹底改變當地生態結構，極難清除。'
+  }
+];
+
+const LEVEL_CONFIG = {
+  4:  { label: '初級', cls: 'easy',   cols: 'cols-4', emoji: '🌱' },
+  8:  { label: '中級', cls: 'medium', cols: 'cols-4', emoji: '🌿' },
+  12: { label: '高級', cls: 'hard',   cols: 'cols-6', emoji: '🌳' }
+};
+
+let activePlants = [];
+let currentPairCount = 4;
+let cards = [];
+let flippedCards = [];
+let matchedCount = 0;
+let isLocked = false;
+
+// ── 難度選擇 ──
+function startGame(pairCount) {
+  currentPairCount = pairCount;
+  document.getElementById('level-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+
+  const cfg = LEVEL_CONFIG[pairCount];
+  const badge = document.getElementById('level-badge');
+  badge.textContent = cfg.emoji + ' ' + cfg.label;
+  badge.className = 'level-badge ' + cfg.cls;
+
+  const grid = document.getElementById('card-grid');
+  grid.className = 'card-grid ' + cfg.cols;
+
+  activePlants = shuffle([...ALL_PLANTS]).slice(0, pairCount);
+  initGame();
+}
+
+function goToLevelSelect() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('level-screen').style.display = 'flex';
+}
+
+// ── 遊戲初始化 ──
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function buildCards() {
+  const raw = [];
+  activePlants.forEach(p => {
+    raw.push({ type: 'name', plantId: p.id });
+    raw.push({ type: 'clue', plantId: p.id });
+  });
+  return shuffle(raw).map((c, i) => ({ ...c, index: i, isFlipped: false, isMatched: false }));
+}
+
+function renderGrid() {
+  const grid = document.getElementById('card-grid');
+  grid.innerHTML = '';
+  cards.forEach(card => {
+    const plant = activePlants.find(p => p.id === card.plantId);
+    const el = document.createElement('div');
+    el.className = 'card ' + (card.type === 'name' ? 'name-card' : 'clue-card');
+    el.dataset.index = card.index;
+    el.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-back">
+          <span class="leaf">🌿</span>
+          <span class="back-label">翻牌</span>
+        </div>
+        <div class="card-face card-front">
+          ${card.type === 'name'
+            ? `<span class="card-type-tag">植物名稱</span>
+               <div class="cn-name">${plant.cn}</div>`
+            : `<span class="card-type-tag">植物特徵</span>
+               <div class="clue-text">${plant.clue}</div>`
+          }
+        </div>
+      </div>`;
+    el.addEventListener('click', () => onCardClick(card.index));
+    grid.appendChild(el);
+  });
+}
+
+function initGame() {
+  cards = buildCards();
+  flippedCards = [];
+  matchedCount = 0;
+  isLocked = false;
+  updateProgress();
+  document.getElementById('info-area').innerHTML =
+    '<div class="info-placeholder">配對成功後<br>這裡會顯示<br>植物的詳細資訊</div>';
+  renderGrid();
+}
+
+// ── 遊戲邏輯 ──
+function onCardClick(index) {
+  if (isLocked) return;
+  const card = cards[index];
+  if (card.isFlipped || card.isMatched) return;
+  if (flippedCards.length === 2) return;
+
+  card.isFlipped = true;
+  flippedCards.push(card);
+  updateCardEl(index);
+
+  if (flippedCards.length === 2) {
+    isLocked = true;
+    setTimeout(checkMatch, 1000);
+  }
+}
+
+function updateCardEl(index) {
+  const card = cards[index];
+  const el = document.querySelector(`[data-index="${index}"]`);
+  if (!el) return;
+  el.classList.toggle('flipped', card.isFlipped && !card.isMatched);
+  el.classList.toggle('matched', card.isMatched);
+}
+
+function checkMatch() {
+  const [a, b] = flippedCards;
+  const isMatch = (a.plantId === b.plantId) && (a.type !== b.type);
+
+  if (isMatch) {
+    a.isMatched = b.isMatched = true;
+    a.isFlipped = b.isFlipped = false;
+    updateCardEl(a.index);
+    updateCardEl(b.index);
+    matchedCount++;
+    updateProgress();
+    showPlantInfo(a.plantId);
+    if (matchedCount === activePlants.length) setTimeout(showCompletion, 600);
+  } else {
+    a.isFlipped = b.isFlipped = false;
+    updateCardEl(a.index);
+    updateCardEl(b.index);
+  }
+
+  flippedCards = [];
+  isLocked = false;
+}
+
+function updateProgress() {
+  document.getElementById('progress-text').textContent = `${matchedCount} / ${activePlants.length}`;
+  document.getElementById('progress-fill').style.width =
+    activePlants.length ? `${(matchedCount / activePlants.length) * 100}%` : '0%';
+}
+
+function showPlantInfo(plantId) {
+  const plant = activePlants.find(p => p.id === plantId);
+  const area = document.getElementById('info-area');
+  if (area.querySelector('.info-placeholder')) {
+    area.innerHTML = '<div class="matched-list" id="matched-list"></div>';
+  }
+  const list = document.getElementById('matched-list');
+  const item = document.createElement('div');
+  item.className = 'plant-card';
+  item.innerHTML = `
+    <div class="pc-name">${plant.cn}</div>
+    <div class="pc-sci">${plant.sci}</div>
+    <span class="pc-tag">原產地：${plant.origin}</span>
+    <div class="pc-body">${plant.detail}</div>`;
+  list.insertBefore(item, list.firstChild);
+}
+
+// ── 完成畫面 ──
+function showCompletion() {
+  const cfg = LEVEL_CONFIG[currentPairCount];
+  document.getElementById('completion-subtitle').textContent =
+    `${cfg.label}完成！你認識了 ${activePlants.length} 種台灣外來入侵植物`;
+  document.getElementById('completion-plants').innerHTML =
+    activePlants.map(p => `<span>${p.cn}</span>`).join('');
+  document.getElementById('overlay').classList.add('show');
+}
+
+document.getElementById('btn-restart').addEventListener('click', () => {
+  document.getElementById('overlay').classList.remove('show');
+  activePlants = shuffle([...ALL_PLANTS]).slice(0, currentPairCount);
+  initGame();
+});
+
+document.getElementById('btn-level-select').addEventListener('click', goToLevelSelect);
+</script>
+</body>
+</html>
